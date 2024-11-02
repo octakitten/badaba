@@ -70,85 +70,120 @@ const server = https.createServer(options, (req, res) => {
                      res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size});
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'image/jpeg') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'image/png') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'text/plain') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'text/css') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'image/gif') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'video/mp4') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'text/csv') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'application/javascript') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'application/json') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'application/xml') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'application/pdf') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size},);
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
                 } else if (file_type == 'application/zip') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
                         "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
-                }
-
-                console.log(`Serving file of type ${file_type} at ${filePath}`);
-                const readStream = fs.createReadStream(filePath);
-                readStream.pipe(res);
-            } else {
-                res.writeHead(403);
-                res.end("Access denied");
-                console.log("Access denied to a request for a file due to: wrong filetype");
-            } 
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
+                } else {
+                    res.writeHead(403);
+                    res.end("Access denied");
+                    console.log("Access denied to a request for a file due to: wrong filetype");
+                } 
+            }
             
         });
     } catch (err) {
