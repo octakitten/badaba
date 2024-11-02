@@ -5,6 +5,7 @@ const mime = require('mime');
 const crypto = require("crypto");
 
 const directoryPath = path.join(__dirname, "index");
+const rootPath = __dirname;
 const certFile = "private-key-";
 
 const options = {
@@ -27,7 +28,7 @@ const server = https.createServer(options, (req, res) => {
         let certFilePath = `${certFile}${username}.pem`;
         try {
             const privateKey = crypto.createPrivateKey({
-                key: fs.readFileSync(path.join(directoryPath, certFilePath)),
+                key: fs.readFileSync(path.join(rootPath, certFilePath)),
                 format: "pem",
                 passphrase: password,
             });
