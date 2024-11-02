@@ -57,8 +57,7 @@ const server = https.createServer(options, (req, res) => {
                     res.writeHead(200, { 'Constent type': file_type });
                     res.createReadStream(filePath.pipe(res));
                 }
-                res.end("File downloaded");
-            } else {
+           } else {
                 res.writeHead(403);
                 res.end("Access denied");
                 console.log("Access denied to a request for a file due to: wrong filetype");
