@@ -33,11 +33,11 @@ const server = https.createServer(options, (req, res) => {
             });
             console.log("Access granted to username: ${username}. Correct password.");
             res.writeHead(200, { "Constent-Type": "text/plain" });
-            res.end("Access granted. Welcome, ${username}!");
+            res.end('Access granted. Welcome, ${username}!');
         }  catch (err) {
             let key = path.join(certFilePath, username, ".pem");
-            console.log("Attempted to check password with: ${key}");
-            console.log("Access denied, incorrect password.");
+            console.log('Attempted to check password with: ${key}');
+            console.log('Access denied, incorrect password.');
             res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
             res.end("Invalid credentials.");
         }
