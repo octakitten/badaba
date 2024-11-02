@@ -4,7 +4,7 @@ const path = require('path');
 const mime = require('mime');
 const crypto = require("crypto");
 
-const directoryPath = path.join(__dirname, "index");
+const directoryPath = __dirname;
 const rootPath = __dirname;
 const certFile = "private-key-";
 
