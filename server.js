@@ -3,6 +3,8 @@ const fs = require('fs')
 const path = require('path');
 const mime = require('mime');
 const crypto = require("crypto");
+const { exec } = require("child_process");
+const { spawn } = require("child_process");
 
 const directoryPath = path.join(__dirname, "/index");
 const rootPath = __dirname;
@@ -64,25 +66,30 @@ const server = https.createServer(options, (req, res) => {
                 return;
             }
             if (stats.isDirectory()) {
-                fs.readdir(directoryPath, (err, files) => {
-                    if (err) {
-                        res.writeHead(500, { "Content-Type": "text/plain" });
-                        res.end("Server error: failed to get directory");
-                        return;
-                    }
+                if (req.url === "/view-output") {
+                    res.writeHead(200,{ "Content-Type": "text/plain"});
+                    res.end(process_output);
+                } else {
+                    fs.readdir(directoryPath, (err, files) => {
+                        if (err) {
+                            res.writeHead(500, { "Content-Type": "text/plain" });
+                            res.end("Server error: failed to get directory");
+                            return;
+                        }
 
-                    res.writeHead(200, { "Content-Type": "text/html" });
-                    res.write("<html><body><h2><File Directory</h2><ul>");
+                        res.writeHead(200, { "Content-Type": "text/html" });
+                        res.write("<html><body><h2><File Directory</h2><ul>");
 
-                    files.forEach((file) => {
-                        const file_path = file;
-                        const fileUrl = `/index/${file_path}`;
+                        files.forEach((file) => {
+                            const file_path = file;
+                            const fileUrl = `/index/${file_path}`;
 
-                        res.write(`<li><a href="${fileUrl}">${file}</a></li>`);
+                            res.write(`<li><a href="${fileUrl}">${file}</a></li>`);
+                        });
+
+                        res.end("</ul></body></html>");
                     });
-
-                    res.end("</ul></body></html>");
-                });
+                }  
             }
             if (stats.isFile()) {
                 let file_name = path.basename(filePath);
@@ -116,7 +123,6 @@ const server = https.createServer(options, (req, res) => {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
@@ -199,14 +205,26 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                } else if (file_type == 'application/x-sh') { 
+                    const script_process = spawn("bash", [filePath]);
+                    script_process.stdout.on("data", (data) => {
+                        process_output += data;
+                    });
+                    script_process.stderr.on("data", (data) => {
+                        console.error(`cript error output: ${data}`);
+                    });
+                    script_process.on("close", (code) => {
+                        console.log(`Script completed with code ${code}`);
+                    });
+                    res.writeHead(200, { "Content-Type": "text/plain" });
+                    res.end(`Script output:\n${stdout}`); 
                 } else {
                     res.writeHead(403);
                     res.end("Access denied");
                     console.log("Access denied to a request for a file due to: wrong filetype");
                 } 
             }
-            
-        });
+        }); 
     } catch (err) {
         console.log(`Attempted to check password with: ${certFilePath}`);
         console.log(`Access denied, incorrect password.`);
