@@ -33,7 +33,28 @@ const server = https.createServer(options, (req, res) => {
             passphrase: password,
         });
         console.log(`Access granted to username: ${username}. Correct password.`);
-               
+        if (req.url === "/index") {
+            fs.readdir(directoryPath, (err, files) => {
+                if (err) {
+                    res.writeHead(500, { "Content-Type": "text/plain" });
+                    res.end("Server error: failed to get directory");
+                    return;
+                }
+
+                res.writeHead(200, { "Content-Type": "text/html" });
+                res.write("<html><body><h2><File Directory</h2><ul>");
+
+                files.forEach((file) => {
+                    const filePath = path.join(directoryPath, file);
+                    const fileUrl = `/index/${filePath}`;
+
+                    res.write(`<li><a href="${fileUrl}">${file}</a></li`);
+                });
+
+                res.end("</ul></body></html>");
+            });
+        }
+              
         fs.stat(filePath, (err, stats) => {
             if (err) {
                 res.writeHead(404);
@@ -42,28 +63,7 @@ const server = https.createServer(options, (req, res) => {
                 console.log(`404 error at ${filePath}`);
                 return;
             }
-            if (req.url === "/index") {
-                fs.readdir(directoryPath, (err, files) => {
-                    if (err) {
-                        res.writeHead(500, { "Content-Type": "text/plain" });
-                        res.end("Server error: failed to get directory");
-                        return;
-                    }
-
-                    res.writeHead(200, { "Content-Type": "text/html" });
-                    res.write("<html><body><h2><File Directory</h2><ul>");
-
-                    files.forEach((file) => {
-                        const filePath = path.join(directoryPath, file);
-                        const fileUrl = `/index/${filePath}`;
-
-                        res.write(`<li><a href="${fileUrl}">${file}</a></li`);
-                    });
-
-                    res.end("</ul></body></html>");
-                });
-            }
-            if (stats.isFile()) {
+        if (stats.isFile()) {
                 let file_name = path.basename(filePath);
                 let file_type = mime.getType(filePath);
                  if (file_type == 'text/html') {
