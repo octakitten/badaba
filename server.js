@@ -32,11 +32,8 @@ const server = https.createServer(options, (req, res) => {
                 passphrase: password,
             });
             console.log(`Access granted to username: ${username}. Correct password.`);
-            res.writeHead(200, { "Constent-Type": "text/plain" });
-            res.end(`Access granted. Welcome, ${username}!`);
-
-       
-        fs.stat(filePath, (err, stats) => {
+                   
+            fs.stat(filePath, (err, stats) => {
             let file_type = mime.getType(filePath);
             if (err) {
                 res.writeHead(404);
@@ -60,12 +57,13 @@ const server = https.createServer(options, (req, res) => {
                     res.writeHead(200, { 'Constent type': file_type });
                     res.createReadStream(filePath.pipe(res));
                 }
-        } else {
-            res.writeHead(403);
-            res.end("Access denied");
-            console.log("Access denied to a request for a file due to: wrong filetype");
-        }
-    });
+                res.end("File downloaded");
+            } else {
+                res.writeHead(403);
+                res.end("Access denied");
+                console.log("Access denied to a request for a file due to: wrong filetype");
+            }
+        });
         }  catch (err) {
             console.log(`Attempted to check password with: ${certFilePath}`);
             console.log(`Access denied, incorrect password.`);
