@@ -5,7 +5,7 @@ const mime = require('mime');
 const crypto = require("crypto");
 
 const directoryPath = __dirname;
-const certFilePath = "certificate-";
+const certFilePath = "private-key-";
 
 const options = {
     key: fs.readFileSync('key.pem'),
