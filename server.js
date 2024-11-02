@@ -35,7 +35,6 @@ const server = https.createServer(options, (req, res) => {
         console.log(`Access granted to username: ${username}. Correct password.`);
                
         fs.stat(filePath, (err, stats) => {
-            let file_type = mime.getType(filePath);
             if (err) {
                 res.writeHead(404);
                 res.end("Page not found!");
@@ -66,6 +65,7 @@ const server = https.createServer(options, (req, res) => {
             }
             if (stats.isFile()) {
                 let file_name = path.basename(filePath);
+                let file_type = mime.getType(filePath);
                  if (file_type == 'text/html') {
                      res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
