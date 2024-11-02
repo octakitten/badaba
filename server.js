@@ -71,7 +71,7 @@ const server = https.createServer(options, (req, res) => {
                         res.write("<html><body><h2><File Directory</h2><ul>");
 
                         files.forEach((file) => {
-                            res.write(`<li><a href="${req.url}${file}">${file}</a></li>`);
+                            res.write(`<li><a href="${req.url}/${file}">${file}</a></li>`);
                         });
 
                         res.end("</ul></body></html>");
@@ -89,7 +89,7 @@ const server = https.createServer(options, (req, res) => {
                         res.write("<html><body><h2><File Directory</h2><ul>");
 
                         files.forEach((file) => {
-                            res.write(`<li><a href="${req.url}${file}">${file}</a></li>`);
+                            res.write(`<li><a href="${req.url}/${file}">${file}</a></li>`);
                         });
 
                         res.end("</ul></body></html>");
