@@ -92,8 +92,7 @@ const server = https.createServer(options, (req, res) => {
                         res.write("<html><body><h2><File Directory</h2><ul>");
 
                         files.forEach((file) => {
-                            const fileUrl = `${filePath}${file}`;
-                            res.write(`<li><a href="${fileUrl}">${file}</a></li>`);
+                            res.write(`<li><a href="${filePath}">${file}</a></li>`);
                         });
 
                         res.end("</ul></body></html>");
