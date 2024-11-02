@@ -4,7 +4,7 @@ const path = require('path');
 const mime = require('mime');
 const crypto = require("crypto");
 
-const directoryPath = __dirname;
+const directoryPath = path.join(__dirname, "/index");
 const rootPath = __dirname;
 const certFile = "private-key-";
 
@@ -48,7 +48,7 @@ const server = https.createServer(options, (req, res) => {
                     const filePath = path.join(directoryPath, file);
                     const fileUrl = `/index/${filePath}`;
 
-                    res.write(`<li><a href="${fileUrl}">${file}</a></li`);
+                    res.write(`<li><a href="${fileUrl}">${file}</a></li>`);
                 });
 
                 res.end("</ul></body></html>");
