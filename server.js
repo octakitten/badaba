@@ -244,13 +244,13 @@ const server = https.createServer(options, (req, res) => {
                         process_output += data;
                     });
                     script_process.stderr.on("data", (data) => {
-                        console.error(`cript error output: ${data}`);
+                        console.error(`Script error output: ${data}`);
                     });
                     script_process.on("close", (code) => {
                         console.log(`Script completed with code ${code}`);
                     });
                     res.writeHead(200, { "Content-Type": "text/plain" });
-                    res.end(`Script output:\n${stdout}`); 
+                    res.end(`Script output:\n${process_output}`); 
                 } else {
                     res.writeHead(403);
                     res.end("Access denied");
