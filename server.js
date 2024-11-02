@@ -15,10 +15,17 @@ const options = {
     cert: fs.readFileSync('cert.pem')
 };
 
+let process_output = "";
+
 const server = https.createServer(options, (req, res) => {
     const filePath = path.join(rootPath, req.url);
     const auth = req.headers["authorization"];
 
+    // first we get user authentication
+    // we need to create the user credentials beforehand,
+    // while manually logged into the server
+    //
+    // then we can enter them when first accessing the server at any address
     if (!auth) {
         res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
         res.end("Authentication required.");
@@ -28,6 +35,7 @@ const server = https.createServer(options, (req, res) => {
     const credentials = Buffer.from(base64Credentials, "base64").toString("utf8");
     const [username, password] = credentials.split(":");
     let certFilePath = `${certFile}${username}.pem`;
+    // check if pw is right
     try {
         const privateKey = crypto.createPrivateKey({
             key: fs.readFileSync(path.join(rootPath, certFilePath)),
@@ -35,29 +43,8 @@ const server = https.createServer(options, (req, res) => {
             passphrase: password,
         });
         console.log(`Access granted to username: ${username}. Correct password.`);
-        if (req.url === "/index") {
-            fs.readdir(directoryPath, (err, files) => {
-                if (err) {
-                    res.writeHead(500, { "Content-Type": "text/plain" });
-                    res.end("Server error: failed to get directory");
-                    return;
-                }
-
-                res.writeHead(200, { "Content-Type": "text/html" });
-                res.write("<html><body><h2><File Directory</h2><ul>");
-
-                files.forEach((file) => {
-                    const file_path = file;
-                    const fileUrl = `/index/${file_path}`;
-
-                    res.write(`<li><a href="${fileUrl}">${file}</a></li>`);
-                });
-
-                res.end("</ul></body></html>");
-            });
-        }
-              
         fs.stat(filePath, (err, stats) => {
+            // handle bad url first
             if (err) {
                 res.writeHead(404);
                 res.end("Page not found!");
@@ -65,11 +52,14 @@ const server = https.createServer(options, (req, res) => {
                 console.log(`404 error at ${filePath}`);
                 return;
             }
+            // handle directories here
             if (stats.isDirectory()) {
+                // first see if we need to view stdout of a running script
                 if (req.url === "/view-output") {
                     res.writeHead(200,{ "Content-Type": "text/plain"});
                     res.end(process_output);
-                } else {
+                // next see if we need to return to the main index
+                } else if (req.url === "/index") {
                     fs.readdir(directoryPath, (err, files) => {
                         if (err) {
                             res.writeHead(500, { "Content-Type": "text/plain" });
@@ -89,11 +79,36 @@ const server = https.createServer(options, (req, res) => {
 
                         res.end("</ul></body></html>");
                     });
+                // and lastly handle navigating sub directories
+                } else {
+                    fs.readdir(filePath, (err, files) => {
+                        if (err) {
+                            res.writeHead(500, { "Content-Type": "text/plain" });
+                            res.end("Server error: failed to get directory");
+                            return;
+                        }
+
+                        res.writeHead(200, { "Content-Type": "text/html" });
+                        res.write("<html><body><h2><File Directory</h2><ul>");
+
+                        files.forEach((file) => {
+                            const fileUrl = `${filePath}${file}`;
+                            res.write(`<li><a href="${fileUrl}">${file}</a></li>`);
+                        });
+
+                        res.end("</ul></body></html>");
+                    });
                 }  
             }
+            // handle files here
             if (stats.isFile()) {
                 let file_name = path.basename(filePath);
                 let file_type = mime.getType(filePath);
+                // file types aren't ordered well but the gist of it is that
+                // text files and pdfs are rendered in the browser 
+                // and other files are served as downloads
+                //
+                // html
                  if (file_type == 'text/html') {
                      res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -101,6 +116,7 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // jpg
                 } else if (file_type == 'image/jpeg') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -110,6 +126,7 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // png
                 } else if (file_type == 'image/png') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -119,6 +136,7 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // plain text
                 } else if (file_type == 'text/plain') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -127,6 +145,7 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // css
                 } else if (file_type == 'text/css') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -135,6 +154,7 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // gif
                 } else if (file_type == 'image/gif') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -144,6 +164,7 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // mp4
                 } else if (file_type == 'video/mp4') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -153,24 +174,27 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // csv
                 } else if (file_type == 'text/csv') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // javascript
+                // rendered in browser
                 } else if (file_type == 'application/javascript') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // json
+                // sent as a download
                 } else if (file_type == 'application/json') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -180,6 +204,8 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // xml
+                // sent as a download
                 } else if (file_type == 'application/xml') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -189,6 +215,7 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // pdf
                 } else if (file_type == 'application/pdf') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -196,6 +223,7 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // zip archive
                 } else if (file_type == 'application/zip') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
@@ -205,6 +233,15 @@ const server = https.createServer(options, (req, res) => {
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
+                // bash script
+                    // WARNING!!!
+                    // this is an important one because bash scripts kept on the server
+                    // are executed in a child process rather than served to the user
+                    // don't put a bash script on the server in or below the index directory
+                    // unles you're okay with or want users to run it on your server
+                    //
+                    // additionally, it'll log the stdout of the process until it exits
+                    // you can view this output by entering the /view-output url
                 } else if (file_type == 'application/x-sh') { 
                     const script_process = spawn("bash", [filePath]);
                     script_process.stdout.on("data", (data) => {
@@ -225,6 +262,8 @@ const server = https.createServer(options, (req, res) => {
                 } 
             }
         }); 
+        // handle password faiure here
+        // TODO lock down auth entry after too many failed attempts
     } catch (err) {
         console.log(`Attempted to check password with: ${certFilePath}`);
         console.log(`Access denied, incorrect password.`);
