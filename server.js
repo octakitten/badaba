@@ -41,22 +41,84 @@ const server = https.createServer(options, (req, res) => {
                 return;
             }
             if (stats.isFile()) {
-                if (file_type == 'html') {
-                    res.writeHead(200, { 'Content type': mime.getType(filePath) });
-                    res.createReadStream(filePath).pipe(res);
-                 } else if (file_type == 'jpg') {
-                    res.writeHead(200, { 'Constent type': file_type });
-                    res.createReadStream(filePath.pipe(res));
-                } else if (file_type == 'png') {
-                    res.writeHead(200, { 'Constent type': file_type });
-                    res.createReadStream(filePath.pipe(res));
-                } else if (file_type == 'txt') {
-                    res.writeHead(200, { 'Constent type': file_type });
-                    res.createReadStream(filePath.pipe(res));
-                } else if (file_type == '') {
-                    res.writeHead(200, { 'Constent type': file_type });
-                    res.createReadStream(filePath.pipe(res));
+                let file_name = path.basename(filePath);
+                if (file_type == 'text/html') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size});
+                 } else if (file_type == 'image/jpeg') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
+                } else if (file_type == 'image/png') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
+                } else if (file_type == 'text/plain') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
+                } else if (file_type == 'text/css') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                    });
+                } else if (file_type == 'image/gif') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
+                } else if (file_type == 'video/mp4') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
+                } else if (file_type == 'text/csv') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
+                } else if (file_type == 'application/javascript') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
+                } else if (file_type == 'application/json') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
+                } else if (file_type == 'application/xml') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
+                } else if (file_type == 'application/pdf') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size});
+                } else if (file_type == 'application/zip') {
+                    res.writeHead(200, { 
+                        "Content-Type": mime.getType(filePath),
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
                 }
+
+                console.log(`Serving file of type ${file_type} at ${filePath}`);
+                res.createReadStream(filePath.pipe(res));
            } else {
                 res.writeHead(403);
                 res.end("Access denied");
