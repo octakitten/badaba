@@ -118,7 +118,8 @@ const server = https.createServer(options, (req, res) => {
                 }
 
                 console.log(`Serving file of type ${file_type} at ${filePath}`);
-                res.createReadStream(filePath.pipe(res));
+                res.createReadStream(filePath);
+                readStream.pipe(res);
            } else {
                 res.writeHead(403);
                 res.end("Access denied");
