@@ -5,7 +5,7 @@ const mime = require('mime');
 const crypto = require("crypto");
 
 const directoryPath = __dirname;
-const certFilePath = "private-key-";
+const certFile = "private-key-";
 
 const options = {
     key: fs.readFileSync('key.pem'),
@@ -24,10 +24,10 @@ const server = https.createServer(options, (req, res) => {
         const base64Credentials = auth.split(" ")[1];
         const credentials = Buffer.from(base64Credentials, "base64").toString("utf8");
         const [username, password] = credentials.split(":");
-
+        let certFilePath = `${certFile}${username}.pem`;
         try {
             const privateKey = crypto.createPrivateKey({
-                key: fs.readFileSync(path.join(certFilePath, username, ".pem")),
+                key: fs.readFileSync(path.join(directoryPath, certFilePath)),
                 format: "pem",
                 passphrase: password,
             });
@@ -35,8 +35,7 @@ const server = https.createServer(options, (req, res) => {
             res.writeHead(200, { "Constent-Type": "text/plain" });
             res.end(`Access granted. Welcome, ${username}!`);
         }  catch (err) {
-            let key = path.join(certFilePath, username, ".pem");
-            console.log(`Attempted to check password with: ${key}`);
+            console.log(`Attempted to check password with: ${certFilePath}`);
             console.log(`Access denied, incorrect password.`);
             res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
             res.end("Invalid credentials.");
