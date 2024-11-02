@@ -4,6 +4,7 @@ const path = require('path');
 const mime = require('mime');
 const crypto = require("crypto");
 
+const directoryPath = __dirname;
 const certFilePath = "certificate-";
 
 const options = {
