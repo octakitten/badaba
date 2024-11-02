@@ -63,7 +63,28 @@ const server = https.createServer(options, (req, res) => {
                 console.log(`404 error at ${filePath}`);
                 return;
             }
-        if (stats.isFile()) {
+            if (stats.isDirectory()) {
+                fs.readdir(directoryPath, (err, files) => {
+                    if (err) {
+                        res.writeHead(500, { "Content-Type": "text/plain" });
+                        res.end("Server error: failed to get directory");
+                        return;
+                    }
+
+                    res.writeHead(200, { "Content-Type": "text/html" });
+                    res.write("<html><body><h2><File Directory</h2><ul>");
+
+                    files.forEach((file) => {
+                        const file_path = file;
+                        const fileUrl = `/index/${file_path}`;
+
+                        res.write(`<li><a href="${fileUrl}">${file}</a></li>`);
+                    });
+
+                    res.end("</ul></body></html>");
+                });
+            }
+            if (stats.isFile()) {
                 let file_name = path.basename(filePath);
                 let file_type = mime.getType(filePath);
                  if (file_type == 'text/html') {
