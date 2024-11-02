@@ -14,7 +14,7 @@ const options = {
 };
 
 const server = https.createServer(options, (req, res) => {
-    const filePath = path.join(directoryPath, req.url);
+    const filePath = req.url;
     const auth = req.headers["authorization"];
 
     if (!auth) {
