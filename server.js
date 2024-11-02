@@ -39,6 +39,8 @@ const server = https.createServer(options, (req, res) => {
             if (err) {
                 res.writeHead(404);
                 res.end("Page not found!");
+                console.log(err);
+                console.log(`404 error at ${filePath}`);
                 return;
             }
             if (req.url === "/index") {
