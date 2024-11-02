@@ -31,13 +31,13 @@ const server = https.createServer(options, (req, res) => {
                 format: "pem",
                 passphrase: password,
             });
-            console.log("Access granted to username: ${username}. Correct password.");
+            console.log(`Access granted to username: ${username}. Correct password.`);
             res.writeHead(200, { "Constent-Type": "text/plain" });
-            res.end('Access granted. Welcome, ${username}!');
+            res.end(`Access granted. Welcome, ${username}!`);
         }  catch (err) {
             let key = path.join(certFilePath, username, ".pem");
-            console.log('Attempted to check password with: ${key}');
-            console.log('Access denied, incorrect password.');
+            console.log(`Attempted to check password with: ${key}`);
+            console.log(`Access denied, incorrect password.`);
             res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
             res.end("Invalid credentials.");
         }
@@ -77,5 +77,5 @@ const server = https.createServer(options, (req, res) => {
 
 const PORT = 8443;
 server.listen(PORT, () => {
-    console.log('HTTPS server running at https://localhost:${PORT}/');
+    console.log(`HTTPS server running at https://localhost:${PORT}/`);
 });
