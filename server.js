@@ -4,7 +4,7 @@ const path = require('path');
 const mime = require('mime');
 const crypto = require("crypto");
 
-const directoryPath = __dirname;
+const directoryPath = path.join(__dirname, "index");
 const certFile = "private-key-";
 
 const options = {
@@ -40,102 +40,125 @@ const server = https.createServer(options, (req, res) => {
                 res.end("Page not found!");
                 return;
             }
-            if (stats.isFile()) {
-                let file_name = path.basename(filePath);
-                if (file_type == 'text/html') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size});
-                 } else if (file_type == 'image/jpeg') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
-                    });
-                } else if (file_type == 'image/png') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
-                    });
-                } else if (file_type == 'text/plain') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
-                    });
-                } else if (file_type == 'text/css') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                    });
-                } else if (file_type == 'image/gif') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
-                    });
-                } else if (file_type == 'video/mp4') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
-                    });
-                } else if (file_type == 'text/csv') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
-                    });
-                } else if (file_type == 'application/javascript') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
-                    });
-                } else if (file_type == 'application/json') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
-                    });
-                } else if (file_type == 'application/xml') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
-                    });
-                } else if (file_type == 'application/pdf') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size});
-                } else if (file_type == 'application/zip') {
-                    res.writeHead(200, { 
-                        "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size,
-                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                if (req.url == "/index") {
+                    fs.readdir(directoryPath, (err, files) => {
+                        if (err) {
+                            res.writeHead(500, { "Content-Type": "text/plain" });
+                            res.end("Server error: failed to get directory");
+                            return;
+                        }
+
+                        res.writeHead(200, { "Content-Type": "text/html" });
+                        res.write("<html><body><h2><File Directory</h2><ul>");
+
+                        files.forEach((file) => {
+                            const filePath = path.join(directoryPath, file);
+                            const fileUrl = `/index/${filePath}`;
+
+                            res.write(`<li><a href="${fileUrl}">${file}</a></li`);
+                    });system
+
+                        res.end("</ul></body></html>");
                     });
                 }
+                if (stats.isFile()) {
+                    let file_name = path.basename(filePath);
+                     if (file_type == 'text/html') {
+                         res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size});
+                    } else if (file_type == 'image/jpeg') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    } else if (file_type == 'image/png') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    } else if (file_type == 'text/plain') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    } else if (file_type == 'text/css') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                        });
+                    } else if (file_type == 'image/gif') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    } else if (file_type == 'video/mp4') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    } else if (file_type == 'text/csv') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    } else if (file_type == 'application/javascript') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    } else if (file_type == 'application/json') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    } else if (file_type == 'application/xml') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    } else if (file_type == 'application/pdf') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size},);
+                    } else if (file_type == 'application/zip') {
+                        res.writeHead(200, { 
+                            "Content-Type": mime.getType(filePath),
+                            "Content-Length": stats.size,
+                            "Content-Disposition": `attachment; filename="${file_name}"`,
+                        });
+                    }
 
-                console.log(`Serving file of type ${file_type} at ${filePath}`);
-                const readStream = fs.createReadStream(filePath);
-                readStream.pipe(res);
-           } else {
-                res.writeHead(403);
-                res.end("Access denied");
-                console.log("Access denied to a request for a file due to: wrong filetype");
-            }
-        });
-        }  catch (err) {
+                    console.log(`Serving file of type ${file_type} at ${filePath}`);
+                    const readStream = fs.createReadStream(filePath);
+                    readStream.pipe(res);
+               } else {
+                    res.writeHead(403);
+                    res.end("Access denied");
+                    console.log("Access denied to a request for a file due to: wrong filetype");
+                }
+            });
+         }  catch (err) {
             console.log(`Attempted to check password with: ${certFilePath}`);
             console.log(`Access denied, incorrect password.`);
             res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
             res.end("Invalid credentials.");
         }
 
-});
+    });
 
 const PORT = 8443;
 server.listen(PORT, () => {
     console.log(`HTTPS server running at https://localhost:${PORT}/`);
 });
+
+
