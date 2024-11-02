@@ -67,7 +67,7 @@ const server = https.createServer(options, (req, res) => {
         } else {
             res.writeHead(403);
             res.end("Access denied");
-            console.log("Access denied to a request for a file file");
+            console.log("Access denied to a request for a file");
         }
     });
 });
