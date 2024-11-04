@@ -17,7 +17,7 @@ const options = {
 
 let process_output = "";
 
-function make_dir_html(file_urls) {
+function make_dir_html(file_url, files) {
     let html = `
         <!DOCTYPE html>
         <html lang="en">
@@ -38,8 +38,8 @@ function make_dir_html(file_urls) {
         <p>Files and folders:</p>
         <ul>`;
 
-    file_urls.forEach(file => {
-        html += `<li><a href="${file}" target="_blank">${file}</a></li>`;
+    files.forEach(file => {
+        html += `<li><a href="${file_url}${file}" target="_blank">${file}</a></li>`;
     });
 
     html += `
@@ -93,7 +93,7 @@ const server = https.createServer(options, (req, res) => {
                     req.url = "/index";
                 };
                 // first see if we need to view stdout of a running script
-                if (req.url === "/index/view-output") {
+                if (req.url === "/index/view") {
                     res.writeHead(200,{ "Content-Type": "text/plain"});
                     res.end(process_output);
                 // next see if we need to return to the main index
@@ -119,7 +119,7 @@ const server = https.createServer(options, (req, res) => {
                         }
 
                         res.writeHead(200, { "Content-Type": "text/html" });
-                        res.write(make_dir_html(files));
+                        res.write(make_dir_html(req.url, files));
                         res.end();
                     });
                 }  
