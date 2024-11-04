@@ -40,6 +40,7 @@ function make_dir_html(file_url, files) {
     <body>
         <h1>BADABA!</hq>
         <p>Files and folders:</p>
+        <ul><li><a href="${rootPath}" target="_blank">Index</a></li>
         <ul>`;
 
     files.forEach(file => {
