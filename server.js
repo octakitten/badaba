@@ -39,7 +39,8 @@ function make_dir_html(file_url, files) {
         <ul>`;
 
     files.forEach(file => {
-        html += `<li><a href="${file_url}/${file}" target="_blank">${file}</a></li>`;
+        link = path.join(file_url, file);
+        html += `<li><a href="${link}" target="_blank">${file}</a></li>`;
     });
 
     html += `
