@@ -107,6 +107,7 @@ const server = https.createServer(options, (req, res) => {
 
                         res.writeHead(200, { "Content-Type": "text/html" });
                         res.write(make_dir_html(files));
+                        res.end();
                     });
                 // and lastly handle navigating sub directories
                 } else {
@@ -119,6 +120,7 @@ const server = https.createServer(options, (req, res) => {
 
                         res.writeHead(200, { "Content-Type": "text/html" });
                         res.write(make_dir_html(files));
+                        res.end();
                     });
                 }  
             }
