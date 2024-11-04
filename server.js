@@ -287,7 +287,9 @@ const server = https.createServer(options, (req, res) => {
                         detached: true,
                         stdio: "inherit"
                     });  
+                    script_process.stdout.setEncoding('utf8');
                     script_process.stdout.on("data", function(data) {
+
                         data=data.toString();
                         process_output += data;
                         console.log(`Script output: ${data}`);
