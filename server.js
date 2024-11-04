@@ -1,5 +1,5 @@
 const https = require('https');
-const fs = require('fs')
+const fs = require('fs');
 const path = require('path');
 const mime = require('mime');
 const crypto = require("crypto");
@@ -16,6 +16,40 @@ const options = {
 };
 
 let process_output = "";
+
+function make_dir_html(file_urls) {
+    let html = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>BADABA!</title>
+            <style>
+            body { font-family: Arial, sans-serif; }
+            ul { list-style-type: none; padding: 0 }
+            li { margin: 10px 0; }
+            a { text-decoration: none; color: #1e90ff; }
+            a:hover { color: #4682b4; }
+        </style>
+    </head>
+    <body>
+        <h1>BADABA!</hq>
+        <p>Files and folders:</p>
+        <ul>`;
+
+    file_urls.forEach(file => {
+        html += `<li><a href="${file}" target="_blank">${file}</a></li>`;
+    });
+
+    html += `
+            </ul>
+        </body>
+        </html>`;
+
+    return html;
+    }
+    
 
 const server = https.createServer(options, (req, res) => {
     const filePath = path.join(rootPath, req.url);
@@ -54,8 +88,12 @@ const server = https.createServer(options, (req, res) => {
             }
             // handle directories here
             if (stats.isDirectory()) {
+                // if we try to get to the base homepage, redirect to the index
+                if (req.url === "/" || req.url === "") {
+                    req.url = "/index";
+                };
                 // first see if we need to view stdout of a running script
-                if (req.url === "/view-output") {
+                if (req.url === "/index/view-output") {
                     res.writeHead(200,{ "Content-Type": "text/plain"});
                     res.end(process_output);
                 // next see if we need to return to the main index
@@ -68,13 +106,7 @@ const server = https.createServer(options, (req, res) => {
                         }
 
                         res.writeHead(200, { "Content-Type": "text/html" });
-                        res.write("<html><body><h2><File Directory</h2><ul>");
-
-                        files.forEach((file) => {
-                            res.write(`<li><a href="${req.url}/${file}">${file}</a></li>`);
-                        });
-
-                        res.end("</ul></body></html>");
+                        res.write(make_dir_html(files));
                     });
                 // and lastly handle navigating sub directories
                 } else {
@@ -86,13 +118,7 @@ const server = https.createServer(options, (req, res) => {
                         }
 
                         res.writeHead(200, { "Content-Type": "text/html" });
-                        res.write("<html><body><h2><File Directory</h2><ul>");
-
-                        files.forEach((file) => {
-                            res.write(`<li><a href="${req.url}/${file}">${file}</a></li>`);
-                        });
-
-                        res.end("</ul></body></html>");
+                        res.write(make_dir_html(files));
                     });
                 }  
             }
@@ -108,7 +134,9 @@ const server = https.createServer(options, (req, res) => {
                  if (file_type == 'text/html') {
                      res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size});
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                     });
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
@@ -137,6 +165,7 @@ const server = https.createServer(options, (req, res) => {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
@@ -146,6 +175,7 @@ const server = https.createServer(options, (req, res) => {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
@@ -175,6 +205,7 @@ const server = https.createServer(options, (req, res) => {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
@@ -185,6 +216,7 @@ const server = https.createServer(options, (req, res) => {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
                         "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
                     });
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
@@ -215,7 +247,9 @@ const server = https.createServer(options, (req, res) => {
                 } else if (file_type == 'application/pdf') {
                     res.writeHead(200, { 
                         "Content-Type": mime.getType(filePath),
-                        "Content-Length": stats.size},);
+                        "Content-Length": stats.size,
+                        "Content-Disposition": `attachment; filename="${file_name}"`,
+                    });
                     console.log(`Serving file of type ${file_type} at ${filePath}`);
                     const readStream = fs.createReadStream(filePath);
                     readStream.pipe(res);
