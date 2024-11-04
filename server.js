@@ -282,17 +282,24 @@ const server = https.createServer(options, (req, res) => {
                     // additionally, it'll log the stdout of the process until it exits
                     // you can view this output by entering the /view-output url
                 } else if (file_type == 'application/x-sh') { 
-                    const script_process = exec("bash", [filePath]);
-                    script_process.stdout.on("data", (data) => {
+                    const script_process = spawn("bash", [filePath], {
+                        cwd: process.cwd(),
+                        detached: true,
+                        stdio: "inherit"
+                    });
+                    script_process.stdout.setEncoding('utf8');
+                    script_process.stdout.on("data", function(data) {
+                        data=data.toString();
                         process_output += data;
                         console.log(`Script output: ${data}`);
                     });
-                    script_process.stderr.on("data", (data) => {
+                    script_process.stderr.on("data", function(data) {
                         console.error(`Script error output: ${data}`);
                     });
                     script_process.on("close", (code) => {
                         console.log(`Script completed with code ${code}`);
                     });
+                    script_process.listen
                     res.writeHead(200, { "Content-Type": "text/plain" });
                     res.end(`Script output:\n${process_output}`); 
                 } else {
