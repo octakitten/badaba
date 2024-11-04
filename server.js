@@ -295,7 +295,7 @@ const server = https.createServer(options, (req, res) => {
                         shell: true,
                         detached: true,
                         stdio: "inherit",
-                        signal: abort
+                        signal: abort.abort(),
                     });  
                     script_process.stdout.setEncoding('utf8');
                     script_process.stdout.on("data", function(data) {
