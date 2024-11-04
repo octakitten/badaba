@@ -65,6 +65,9 @@ const server = https.createServer(options, (req, res) => {
     const filePath = path.join(rootPath, req.url);
     const auth = req.headers["authorization"];
 
+    let script_running = false;
+    const abort = new AbortController();
+
     // first we get user authentication
     // we need to create the user credentials beforehand,
     // while manually logged into the server
@@ -282,7 +285,12 @@ const server = https.createServer(options, (req, res) => {
                     // additionally, it'll log the stdout of the process until it exits
                     // you can view this output by entering the /view-output url
                 } else if (file_type == 'application/x-sh') {
-                    const abort = new AbortController();
+                    if (script_toggle == false) {
+                        script_toggle = true;
+                    } else {
+                        script_toggle = false;
+                        abort.abort();
+                    }
                     const script_process = spawn("bash", [filePath], {
                         shell: true,
                         detached: true,
@@ -305,9 +313,6 @@ const server = https.createServer(options, (req, res) => {
                         process_output += data;
                         console.log(`Script completed with code ${code}`);
                     });
-                    script_process.listen
-                    res.writeHead(200, { "Content-Type": "text/plain" });
-                    res.end(`Script output:\n${process_output}`); 
                 } else {
                     res.writeHead(403);
                     res.end("Access denied");
