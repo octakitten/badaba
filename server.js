@@ -39,7 +39,7 @@ function make_dir_html(file_url, files) {
         <ul>`;
 
     files.forEach(file => {
-        html += `<li><a href="${file_url}${file}" target="_blank">${file}</a></li>`;
+        html += `<li><a href="${file_url}/${file}" target="_blank">${file}</a></li>`;
     });
 
     html += `
@@ -90,7 +90,7 @@ const server = https.createServer(options, (req, res) => {
             if (stats.isDirectory()) {
                 // if we try to get to the base homepage, redirect to the index
                 if (req.url === "/" || req.url === "") {
-                    req.url = "/index";
+                    req.url = "/index/";
                 };
                 // first see if we need to view stdout of a running script
                 if (req.url === "/index/view") {
