@@ -52,6 +52,10 @@ function make_dir_html(file_url, files) {
     
 
 const server = https.createServer(options, (req, res) => {
+    // first of if we get the base homepage, redirect to the index   
+    if (req.url === "/" || req.url === "") {
+        req.url = "/index/";
+    };
     const filePath = path.join(rootPath, req.url);
     const auth = req.headers["authorization"];
 
@@ -89,9 +93,6 @@ const server = https.createServer(options, (req, res) => {
             // handle directories here
             if (stats.isDirectory()) {
                 // if we try to get to the base homepage, redirect to the index
-                if (req.url === "/" || req.url === "") {
-                    req.url = "/index/";
-                };
                 // first see if we need to view stdout of a running script
                 if (req.url === "/index/view") {
                     res.writeHead(200,{ "Content-Type": "text/plain"});
