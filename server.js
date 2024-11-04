@@ -65,7 +65,7 @@ const server = https.createServer(options, (req, res) => {
     const filePath = path.join(rootPath, req.url);
     const auth = req.headers["authorization"];
 
-    let script_running = false;
+    let script_toggle = false;
     const abort = new AbortController();
 
     // first we get user authentication
