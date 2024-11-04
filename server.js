@@ -97,7 +97,7 @@ const server = https.createServer(options, (req, res) => {
                     res.writeHead(200,{ "Content-Type": "text/plain"});
                     res.end(process_output);
                 // next see if we need to return to the main index
-                } else if (req.url === "/index") {
+                } else if (req.url === "index") {
                     fs.readdir(directoryPath, (err, files) => {
                         if (err) {
                             res.writeHead(500, { "Content-Type": "text/plain" });
