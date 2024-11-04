@@ -26,11 +26,15 @@ function make_dir_html(file_url, files) {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>BADABA!</title>
             <style>
-            body { font-family: Arial, sans-serif; }
+            body {
+                background-color: #232523;
+                color: #2ae68d;
+                font-family: Arial, sans-serif; 
+            }
             ul { list-style-type: none; padding: 0 }
             li { margin: 10px 0; }
-            a { text-decoration: none; color: #1e90ff; }
-            a:hover { color: #4682b4; }
+            a { text-decoration: none; color: #24d9e3; }
+            a:hover { color: #76cbe7; }
         </style>
     </head>
     <body>
