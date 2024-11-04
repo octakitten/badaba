@@ -282,7 +282,7 @@ const server = https.createServer(options, (req, res) => {
                     // additionally, it'll log the stdout of the process until it exits
                     // you can view this output by entering the /view-output url
                 } else if (file_type == 'application/x-sh') { 
-                    const script_process = spawn("bash", [filePath]);
+                    const script_process = exec("bash", [filePath]);
                     script_process.stdout.on("data", (data) => {
                         process_output += data;
                         console.log(`Script output: ${data}`);
