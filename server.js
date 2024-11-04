@@ -242,6 +242,7 @@ const server = https.createServer(options, (req, res) => {
                     const script_process = spawn("bash", [filePath]);
                     script_process.stdout.on("data", (data) => {
                         process_output += data;
+                        console.log(`Script output: ${data}`);
                     });
                     script_process.stderr.on("data", (data) => {
                         console.error(`Script error output: ${data}`);
