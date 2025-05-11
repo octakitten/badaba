@@ -1,2 +1,6 @@
 *.pem
 *.pfx
+node_modules
+mv/
+index/opencb-tensing/
+index/silky/
