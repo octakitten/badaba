@@ -4,3 +4,11 @@ node_modules
 mv/
 index/opencb-tensing/
 index/silky/
+opencb-testing
+silky
+*.whl
+start_screen
+victory_condition
+package.json
+package-lock.json
+*.log
