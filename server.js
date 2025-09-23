@@ -315,9 +315,10 @@ const server = https.createServer(options, (req, res) => {
     }
 });
 
-const PORT = 8443;
-server.listen(PORT, () => {
-    console.log(`HTTPS server running at https://localhost:${PORT}/`);
+const PORT = 8447;
+const HOST = '0.0.0.0';
+server.listen(PORT, HOST, () => {
+    console.log(`HTTPS server running at https://${HOST}:${PORT}/`);
 });
 
 
