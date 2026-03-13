@@ -55,7 +55,48 @@ function make_dir_html(file_url, files) {
 
     return html;
     }
+
+function check_if_banned(ip, banned_ips) {
+    for (banned in banned_ips) {
+        if (banned == ip) {
+            return true;
+        }
+    }
+    return false;
+}
     
+function check_if_warned(ip, warned_ips) {
+    for (warned in warned_ips) {
+        if (warned == ip) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function undo_warning(ip, warned_ips) {
+    for (int i = 0; i < warned_ips.length; i++) {
+        if (warned_ips[i] == ip) {
+            warned_ips[i] = -1;
+        }
+    }
+}
+
+function undo_ban(ip, banned_ips) {
+    for (int i = 0; i < banned_ips.length; i++) {
+        if (banned_ips[i] == ip) {
+            banned_ips[i] = -1;
+        }
+    }
+}
+
+function display_bans(banned_ips) {
+    console.log(`Banned ip addresses: `);
+    for (banned in banned_ips) {
+        console.log(`${banned} `);
+    }
+    console.log(`End banned ip addresses list.`);
+}
 
 const server = https.createServer(options, (req, res) => {
     // first of if we get the base homepage, redirect to the index   
@@ -70,6 +111,7 @@ const server = https.createServer(options, (req, res) => {
     // while manually logged into the server
     //
     // then we can enter them when first accessing the server at any address
+    let banned_ips = [];
     if (!auth) {
         res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
         res.end("Authentication required.");
@@ -81,12 +123,16 @@ const server = https.createServer(options, (req, res) => {
     let certFilePath = `${certFile}${username}.pem`;
     // check if pw is right
     try {
+        if (check_if_banned(req.connection.remoteAddress)) {
+            throw Error() banned_error;
+        }
         const privateKey = crypto.createPrivateKey({
             key: fs.readFileSync(path.join(rootPath, certFilePath)),
             format: "pem",
             passphrase: password,
         });
         console.log(`Access granted to username: ${username}. Correct password.`);
+        
         fs.stat(filePath, (err, stats) => {
             // handle bad url first
             if (err) {
@@ -103,6 +149,9 @@ const server = https.createServer(options, (req, res) => {
                 if (req.url === "/index/view") {
                     res.writeHead(200,{ "Content-Type": "text/plain"});
                     res.end(process_output);
+                if (req.url == "/index/ban") {
+                    res.writeHead(200, { "Content-Type": "text/html" });
+                    res.
                 // next see if we need to return to the main index
                 } else if (req.url === "index") {
                     fs.readdir(directoryPath, (err, files) => {
@@ -307,12 +356,21 @@ const server = https.createServer(options, (req, res) => {
         }); 
         // handle password faiure here
         // TODO lock down auth entry after too many failed attempts
-    } catch (err) {
+    } catch (banned_error) {
+        console.log.(`Banned user attempted to connect with ip address: ${req.connection.remoteAddress}`);
+        res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
+        res.end("Invalid credentials.");
+    } catch (error) {
         console.log(`Attempted to check password with: ${certFilePath}`);
         console.log(`Access denied, incorrect password.`);
         res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
         res.end("Invalid credentials.");
-    }
+
+        if (check_if_warned(req.connection.remoteAddress)) {
+            banned_ips.push(req.connection.remoteAddress);
+        } else {
+            warned_ips.push(req.connection.remoteAddress);
+        }
 });
 
 const PORT = 8447;
