@@ -123,6 +123,10 @@ const server = https.createServer(options, (req, res) => {
     let certFilePath = `${certFile}${username}.pem`;
     // check if pw is right
     try {
+        if (req.connection.remoteAddress == "127.1.1.1") {
+
+        }
+
         if (check_if_banned(req.connection.remoteAddress)) {
             throw Error() banned_error;
         }
@@ -131,6 +135,29 @@ const server = https.createServer(options, (req, res) => {
             format: "pem",
             passphrase: password,
         });
+        auth = true;
+        // handle password faiure and banned users here
+    } catch (banned_error) {
+        console.log.(`Banned user attempted to connect with ip address: ${req.connection.remoteAddress}`);
+        res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
+        res.end("Invalid credentials.");
+        auth = false;
+    } catch (error) {
+        console.log(`Attempted to check password with: ${certFilePath}`);
+        console.log(`Access denied, incorrect password.`);
+        res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
+        res.end("Invalid credentials.");
+
+        if (check_if_warned(req.connection.remoteAddress)) {
+            banned_ips.push(req.connection.remoteAddress);
+        } else {
+            warned_ips.push(req.connection.remoteAddress);
+        }
+        auth = false;
+    }
+
+    if (auth) {
+
         console.log(`Access granted to username: ${username}. Correct password.`);
         
         fs.stat(filePath, (err, stats) => {
@@ -351,26 +378,9 @@ const server = https.createServer(options, (req, res) => {
                     res.writeHead(403);
                     res.end("Access denied");
                     console.log("Access denied to a request for a file due to: wrong filetype");
-                } 
+                }
             }
         }); 
-        // handle password faiure here
-        // TODO lock down auth entry after too many failed attempts
-    } catch (banned_error) {
-        console.log.(`Banned user attempted to connect with ip address: ${req.connection.remoteAddress}`);
-        res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
-        res.end("Invalid credentials.");
-    } catch (error) {
-        console.log(`Attempted to check password with: ${certFilePath}`);
-        console.log(`Access denied, incorrect password.`);
-        res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
-        res.end("Invalid credentials.");
-
-        if (check_if_warned(req.connection.remoteAddress)) {
-            banned_ips.push(req.connection.remoteAddress);
-        } else {
-            warned_ips.push(req.connection.remoteAddress);
-        }
 });
 
 const PORT = 8447;
