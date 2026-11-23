@@ -5,6 +5,8 @@ let
     ref = "refs/heads/nixpkgs-unstable";
     rev = "e6f23dc08d3624daab7094b701aa3954923c6bbb";
   }) {};
+  username = builtins.readFile ./username.txt
+  password = builtins.readFile ./password.txt
 in pkgs.mkShell {
   packages = [
   pkgs.bash
@@ -13,7 +15,7 @@ in pkgs.mkShell {
   ];
   shellHook = ''
     cert.sh
-    keygen.sh
+    keygen.sh ${username} ${password}
     node install
     node server.js
     '';
