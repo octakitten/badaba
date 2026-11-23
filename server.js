@@ -175,6 +175,7 @@ const server = https.createServer(options, (req, res) => {
                 if (req.url === "/index/view") {
                     res.writeHead(200,{ "Content-Type": "text/plain"});
                     res.end(process_output);
+                }
                 if (req.url == "/index/ban") {
                     res.writeHead(200, { "Content-Type": "text/html" });
                     res.end();
@@ -379,9 +380,9 @@ const server = https.createServer(options, (req, res) => {
                     console.log("Access denied to a request for a file due to: wrong filetype");
                 }
             }
-        })
+        });
     }
-})
+});
 
 const PORT = 8447;
 const HOST = '0.0.0.0';
