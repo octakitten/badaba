@@ -12,3 +12,4 @@ victory_condition
 package.json
 package-lock.json
 *.log
+*.txt

@@ -75,7 +75,7 @@ function check_if_warned(ip, warned_ips) {
 }
 
 function undo_warning(ip, warned_ips) {
-    for (int i = 0; i < warned_ips.length; i++) {
+    for (let i = 0; i < warned_ips.length; i++) {
         if (warned_ips[i] == ip) {
             warned_ips[i] = -1;
         }
@@ -83,7 +83,7 @@ function undo_warning(ip, warned_ips) {
 }
 
 function undo_ban(ip, banned_ips) {
-    for (int i = 0; i < banned_ips.length; i++) {
+    for (let i = 0; i < banned_ips.length; i++) {
         if (banned_ips[i] == ip) {
             banned_ips[i] = -1;
         }
@@ -128,7 +128,11 @@ const server = https.createServer(options, (req, res) => {
         }
 
         if (check_if_banned(req.connection.remoteAddress)) {
-            throw Error() banned_error;
+            console.log(`Banned user attempted to connect with ip address: ${req.connection.remoteAddress}`);
+            res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
+            res.end("Invalid credentials.");
+            auth = false;
+            throw new Error("Banned user attempted to connect.");
         }
         const privateKey = crypto.createPrivateKey({
             key: fs.readFileSync(path.join(rootPath, certFilePath)),
@@ -137,11 +141,6 @@ const server = https.createServer(options, (req, res) => {
         });
         auth = true;
         // handle password faiure and banned users here
-    } catch (banned_error) {
-        console.log.(`Banned user attempted to connect with ip address: ${req.connection.remoteAddress}`);
-        res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Secure Area"' });
-        res.end("Invalid credentials.");
-        auth = false;
     } catch (error) {
         console.log(`Attempted to check password with: ${certFilePath}`);
         console.log(`Access denied, incorrect password.`);
@@ -178,7 +177,7 @@ const server = https.createServer(options, (req, res) => {
                     res.end(process_output);
                 if (req.url == "/index/ban") {
                     res.writeHead(200, { "Content-Type": "text/html" });
-                    res.
+                    res.end();
                 // next see if we need to return to the main index
                 } else if (req.url === "index") {
                     fs.readdir(directoryPath, (err, files) => {
@@ -380,13 +379,13 @@ const server = https.createServer(options, (req, res) => {
                     console.log("Access denied to a request for a file due to: wrong filetype");
                 }
             }
-        }); 
-});
+        })
+    }
+})
 
 const PORT = 8447;
 const HOST = '0.0.0.0';
 server.listen(PORT, HOST, () => {
-    console.log(`HTTPS server running at https://${HOST}:${PORT}/`);
+    console.log("HTTPS server running at https://${HOST}:${PORT}/");
 });
-
 
