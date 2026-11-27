@@ -9,6 +9,7 @@ const { spawn } = require("child_process");
 const directoryPath = path.join(__dirname, "/index");
 const rootPath = __dirname;
 const certFile = "private-key-";
+const net = require('net');
 
 const options = {
     key: fs.readFileSync('key.pem'),
@@ -98,6 +99,28 @@ function display_bans(banned_ips) {
     console.log(`End banned ip addresses list.`);
 }
 
+const local_ips = [
+    '192.168.1.0/24',
+    '10.0.0.0/8'
+];
+
+const allowed_ips = new net.BlockList();
+
+for (const entry of local_ips) {
+    const [address, prefix] = entry.split('/');
+    const type = net.isIP(address);
+
+    if (!type) {
+        throw new Error(`Invalid IP: ${address}`);
+    }
+
+    allowed_ips.addSubnet(
+        address,
+        Number(prefix),
+        type === 4 ? 'ipv4' : 'ipv6'
+    );
+}
+
 const server = https.createServer(options, (req, res) => {
     // first of if we get the base homepage, redirect to the index   
     if (req.url === "/" || req.url === "") {
@@ -105,6 +128,10 @@ const server = https.createServer(options, (req, res) => {
     };
     const filePath = path.join(rootPath, req.url);
     const auth = req.headers["authorization"];
+    
+    // even before user auth we have to check if the incoming connection comes from outside of LAN
+    // if it does, we refuse the connection
+
 
     // first we get user authentication
     // we need to create the user credentials beforehand,
@@ -383,6 +410,25 @@ const server = https.createServer(options, (req, res) => {
         });
     }
 });
+
+server.on('connection', (socket) => {
+    const ip = socket.remoteAddress;
+
+    const mapped = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+    const address = mapped ? mapped[1] : ip;
+
+    const type = net.isIP(address);
+
+    if (
+        !type ||
+        !allowed_ips.check(address, type === 4 ? 'ipv4' : 'ipv6')
+    ) {
+        console.log(`Rejected external connection: ${ip}`);
+        socket.destroy();
+    }
+});
+
+
 
 const PORT = 8447;
 const HOST = '0.0.0.0';
